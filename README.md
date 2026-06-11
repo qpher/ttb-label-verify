@@ -10,7 +10,7 @@ Verified end-to-end on the deployed instance: 8/8 expected verdicts on the
 
 ## How it works
 
-> Full pipeline diagram: [docs/app-flow.html](docs/app-flow.html) — decision log: [docs/adr/](docs/adr/)
+> Full pipeline diagram: [docs/app-flow.html](docs/app-flow.html) *(HTML — view via the [deployed copy](https://ttb-label-verify.onrender.com/docs/app-flow.html) or open locally)* — decision log: [docs/adr/](docs/adr/)
 
 1. The label image is sent to **Claude Vision** (Haiku, for speed), which *only extracts* what is printed on the label — brand name, ABV, warning text, formatting cues (caps/bold), and image-quality issues. It is explicitly instructed not to judge or correct.
 2. **Deterministic, unit-tested Python code** compares the extraction against the application data. All pass/fail decisions live in `backend/app/matching.py`, so results are auditable, consistent, and testable — important for a compliance tool.
@@ -65,7 +65,7 @@ Push to GitHub, create a new Blueprint service from `render.yaml`, set `ANTHROPI
 cd backend && python -m pytest tests/ -v
 ```
 
-24 tests cover the matching logic and the streaming batch endpoint (run against a real uvicorn instance to prove results arrive incrementally), including the stakeholder edge cases: Dave's `STONE'S THROW` capitalization scenario, Jenny's title-case `Government Warning` rejection, format-variant ABV/volume strings, and proof/ABV consistency.
+28 tests cover the matching logic and the streaming batch endpoint (run against a real uvicorn instance to prove results arrive incrementally), including the stakeholder edge cases: Dave's `STONE'S THROW` capitalization scenario, Jenny's title-case `Government Warning` rejection, format-variant ABV/volume strings, and proof/ABV consistency.
 
 ## API
 

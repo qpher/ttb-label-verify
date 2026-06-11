@@ -32,3 +32,14 @@ The final verdict for the warning field is computed in code from (transcription 
 - (+) Each layer is applied where it is strong: code for exactness, model for judgment.
 - (−) Transcription errors by the model can still cause false results; mitigated by displaying the transcription for human confirmation in NEEDS REVIEW cases (ADR-003).
 - (−) Bold detection from a photo is inherently visual/approximate; it is reported as a model-judged attribute with confidence, and low confidence routes to NEEDS REVIEW rather than PASS.
+
+## Implementation note (post-hoc)
+
+The final implementation moved *further* toward the deterministic side than
+described above: fuzzy comparison of brand/class fields is done in code
+(rapidfuzz similarity bands in `matching.py`), not by model judgment, and the
+formatting attributes are nullable booleans rather than confidence scores —
+`null` (unconfirmable) routes to NEEDS REVIEW. Live testing also showed the
+model's `header_all_caps` boolean can contradict its own transcription, so
+the caps check now derives from the transcribed text, with the boolean able
+only to downgrade a pass (commit f3b7112).
