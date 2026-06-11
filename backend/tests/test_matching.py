@@ -120,6 +120,16 @@ def test_warning_title_case_header_rejected():
     assert "capital" in c.note.lower()
 
 
+def test_warning_title_case_header_rejected_despite_model_boolean():
+    """The vision model has been observed transcribing 'Government Warning:'
+    correctly while wrongly reporting header_all_caps=True. The transcription
+    is the primary evidence — the boolean must not overrule it."""
+    text = STATUTORY_WARNING.replace("GOVERNMENT WARNING:", "Government Warning:")
+    c = check_government_warning(_warning(text=text, caps=True))
+    assert c.status == CheckStatus.mismatch
+    assert "capital" in c.note.lower()
+
+
 def test_warning_not_bold_rejected():
     c = check_government_warning(_warning(bold=False))
     assert c.status == CheckStatus.mismatch

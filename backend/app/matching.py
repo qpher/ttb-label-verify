@@ -292,9 +292,14 @@ def check_government_warning(extracted) -> FieldCheck:
         )
 
     # Header must literally read 'GOVERNMENT WARNING:' in all caps on the label.
-    header_caps = w.header_all_caps
-    if header_caps is None:
-        header_caps = label_text.startswith("GOVERNMENT WARNING:")
+    # The transcription is the primary evidence: the model is instructed to
+    # preserve capitalization exactly, and its header_all_caps boolean has been
+    # observed to contradict its own transcription (claiming caps over a
+    # title-case header). The boolean can only downgrade a caps verdict —
+    # never overrule a transcription that shows lowercase.
+    header_caps = (
+        label_text.startswith("GOVERNMENT WARNING:") and w.header_all_caps is not False
+    )
     if not header_caps:
         problems.append("'GOVERNMENT WARNING:' must appear in capital letters.")
     if w.header_bold is False:
