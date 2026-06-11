@@ -197,13 +197,13 @@ function SingleVerify() {
         <div className="card">
           <h2>2. Application Data <button className="btn-secondary" style={{ float: 'right' }} onClick={fillExample}>Fill example</button></h2>
           <label className="field-label">Brand Name</label>
-          <input type="text" value={form.brand_name} onChange={set('brand_name')} placeholder="OLD TOM DISTILLERY" />
+          <input type="text" value={form.brand_name} onChange={set('brand_name')} placeholder="e.g. OLD TOM DISTILLERY" />
           <label className="field-label">Class / Type</label>
-          <input type="text" value={form.class_type} onChange={set('class_type')} placeholder="Kentucky Straight Bourbon Whiskey" />
+          <input type="text" value={form.class_type} onChange={set('class_type')} placeholder="e.g. Kentucky Straight Bourbon Whiskey" />
           <label className="field-label">Alcohol Content</label>
-          <input type="text" value={form.alcohol_content} onChange={set('alcohol_content')} placeholder="45% Alc./Vol. (90 Proof)" />
+          <input type="text" value={form.alcohol_content} onChange={set('alcohol_content')} placeholder="e.g. 45% Alc./Vol. (90 Proof)" />
           <label className="field-label">Net Contents</label>
-          <input type="text" value={form.net_contents} onChange={set('net_contents')} placeholder="750 mL" />
+          <input type="text" value={form.net_contents} onChange={set('net_contents')} placeholder="e.g. 750 mL" />
           <label className="field-label">Beverage Type</label>
           <select value={form.beverage_type} onChange={set('beverage_type')}>
             <option value="distilled_spirits">Distilled Spirits</option>
@@ -216,7 +216,7 @@ function SingleVerify() {
       <button className="btn" disabled={!ready || busy} onClick={submit}>
         {busy ? <><span className="spinner" />Checking label…</> : 'Verify Label'}
       </button>
-      {!ready && <div className="note" style={{ marginTop: 8 }}>Add a label image and fill in all four fields to verify.</div>}
+      {!ready && <div className="note" style={{ marginTop: 8 }}>Add a label image and type in all four fields to verify — the grey text is just a hint. (Or press “Fill example” to try it out.)</div>}
       {error && <div className="error-box">{error}</div>}
       {result && <div style={{ marginTop: 24 }}><ResultCard result={result} /></div>}
     </div>
