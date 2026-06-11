@@ -95,6 +95,11 @@ Rendered with Pillow rather than AI image generation on purpose: the government 
 words of statutory text that image models reliably garble, and a precision set needs exact,
 known ground truth.
 
+[`test-labels/real/`](test-labels/real/) complements the synthetic set with **real approved
+label artwork from TTB's public COLA registry** (Buffalo Trace, TTB ID 24009001000244) —
+verified end-to-end: back label APPROVED, front-label-only correctly REJECTED for the missing
+warning, and a falsified application ABV correctly caught. See its README for the run results.
+
 ## Abuse & cost controls
 
 This is a public demo that spends API credits per request, so two layers:
