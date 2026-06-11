@@ -1,6 +1,6 @@
 # TTB Label Verification Prototype
 
-**Live demo: <https://ttb-label-verify.onrender.com>** *(free tier — first load after idle takes ~30s to wake)*
+**Live demo: <https://ttb-label-verify.onrender.com>**
 
 AI-assisted verification of alcohol beverage label artwork against COLA application data. An agent (or a batch of up to 300 labels) gets a field-by-field comparison — brand name, class/type, alcohol content, net contents, and the mandatory government health warning — with an APPROVED / NEEDS REVIEW / REJECTED result in a few seconds per label.
 
