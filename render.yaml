@@ -1,0 +1,11 @@
+# One-click deploy to Render (https://render.com)
+services:
+  - type: web
+    name: ttb-label-verify
+    runtime: docker
+    plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false # set in the Render dashboard
+      - key: CLAUDE_MODEL
+        value: claude-haiku-4-5-20251001

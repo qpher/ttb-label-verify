@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Flow — TTB Label Verification Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fafaf7; --ink:#16202e; --ink-soft:#4a5568; --line:#d8d8d0;
+    --fed:#005ea2; --fed-soft:#e8f1f8;
+    --approve:#2e7d32; --review:#b07d12; --reject:#c5311f;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Public Sans',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+       padding:48px 20px 72px;-webkit-font-smoothing:antialiased}
+  .sheet{max-width:880px;margin:0 auto}
+
+  /* header */
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--fed);
+           text-transform:uppercase;font-weight:600}
+  h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.02em;margin:10px 0 8px}
+  .lede{color:var(--ink-soft);max-width:62ch;font-size:15px}
+  .rule{height:3px;background:var(--ink);margin:28px 0 0;position:relative}
+  .rule::after{content:"";position:absolute;left:0;right:0;top:5px;height:1px;background:var(--ink)}
+
+  /* lanes */
+  .lanes{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:36px}
+  .lane-title{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+              color:var(--ink-soft);margin-bottom:10px;font-weight:600}
+  .box{background:#fff;border:1.5px solid var(--ink);padding:16px 18px;position:relative}
+  .box h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .box p{font-size:13.5px;color:var(--ink-soft);margin-top:4px}
+  .sys{font-family:var(--mono);font-size:12px;color:var(--fed);background:var(--fed-soft);
+       display:inline-block;padding:2px 8px;margin-top:10px;font-weight:500}
+  .adr{position:absolute;top:-9px;right:12px;font-family:var(--mono);font-size:10.5px;
+       letter-spacing:.06em;background:var(--ink);color:var(--paper);padding:2px 7px;font-weight:500}
+
+  /* connectors */
+  .drop{width:2px;height:26px;background:var(--ink);margin:0 auto;position:relative}
+  .drop::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+               border:5px solid transparent;border-top:7px solid var(--ink)}
+  .merge{height:30px;position:relative;margin-top:0}
+  .merge::before{content:"";position:absolute;left:25%;right:25%;top:0;height:2px;background:var(--ink)}
+  .merge::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--ink);
+                transform:translateX(-50%)}
+  .merge .leg{position:absolute;top:-26px;width:2px;height:26px;background:var(--ink)}
+  .merge .leg.l{left:25%}.merge .leg.r{right:25%;left:auto}
+  .merge-cap{font-family:var(--mono);font-size:11px;color:var(--ink-soft);text-align:center;
+             letter-spacing:.1em;text-transform:uppercase;padding:6px 0 2px}
+
+  /* engine */
+  .engine{background:#fff;border:2px solid var(--ink);box-shadow:6px 6px 0 var(--ink);
+          padding:22px 22px 18px;position:relative;margin-top:2px}
+  .engine>.adr{top:-10px}
+  .engine-title{font-size:12px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;
+                font-weight:600;color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:10px}
+  .stage{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line)}
+  .stage:last-child{border-bottom:none;padding-bottom:4px}
+  .num{font-family:var(--mono);font-weight:600;font-size:15px;border:1.5px solid var(--ink);
+       width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--paper)}
+  .stage h4{font-size:14.5px;font-weight:700}
+  .stage p{font-size:13px;color:var(--ink-soft);margin-top:3px}
+  .stage code{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--paper);
+              border:1px solid var(--line);padding:0 5px}
+  .trust{font-family:var(--mono);font-size:11.5px;color:var(--fed);margin-top:6px;font-weight:500}
+
+  /* verdict stamps */
+  .verdicts{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:6px;padding:26px 0 8px}
+  .stamp{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.12em;
+         padding:10px 18px;border:3px double currentColor;text-transform:uppercase;background:#fff}
+  .stamp small{display:block;font-size:10px;letter-spacing:.06em;font-weight:400;margin-top:3px;
+               color:var(--ink-soft);text-transform:none}
+  .s-a{color:var(--approve);transform:rotate(-2deg)}
+  .s-r{color:var(--review);transform:rotate(1.2deg)}
+  .s-x{color:var(--reject);transform:rotate(-1deg)}
+  .err-note{text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin-top:10px}
+
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;display:flex;
+         justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);
+         font-size:11px;color:var(--ink-soft);letter-spacing:.04em}
+
+  @media (max-width:680px){
+    .lanes{grid-template-columns:1fr}
+    .merge::before{left:50%;right:auto;width:0}
+    .merge .leg{display:none}
+    body{padding:32px 14px 56px}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .stamp{transition:transform .15s ease}
+    .stamp:hover{transform:rotate(0) scale(1.04)}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="eyebrow">System Flow &middot; AI-Powered Alcohol Label Verification</div>
+    <h1>From upload to verdict</h1>
+    <p class="lede">Every label — single or batch — passes through the same three-stage verification
+    engine. The model reads; the code decides; a human reviews anything ambiguous.</p>
+    <div class="rule"></div>
+  </header>
+
+  <!-- intake lanes -->
+  <div class="lanes">
+    <div>
+      <div class="lane-title">Lane A &middot; Single label</div>
+      <div class="box">
+        <h3>Image + application fields</h3>
+        <p>Agent uploads one label photo and types the application's declared values
+        (brand, class/type, ABV, net contents).</p>
+        <span class="sys">POST /api/verify</span>
+      </div>
+    </div>
+    <div>
+      <div class="lane-title">Lane B &middot; Batch (peak season)</div>
+      <div class="box">
+        <span class="adr">ADR-007</span>
+        <h3>N images + CSV manifest</h3>
+        <p>One request. Uploads are spooled to temp files in 1&nbsp;MB chunks (bounded memory),
+        then processed under a semaphore — 8 labels in flight at once.</p>
+        <span class="sys">POST /api/verify/batch</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="merge"><span class="leg l"></span><span class="leg r"></span></div>
+  <div class="merge-cap">per label &darr;</div>
+
+  <!-- engine -->
+  <div class="engine">
+    <span class="adr">ADR-001 / 002 / 003</span>
+    <div class="engine-title">Verification engine — backend/app/</div>
+
+    <div class="stage">
+      <div class="num">1</div>
+      <div>
+        <h4>Vision extraction <code>claude_client.py</code></h4>
+        <p>One Claude call returns structured JSON: every field as printed, a <em>verbatim</em>
+        transcription of the government warning, formatting attributes
+        (<code>header_all_caps</code>, <code>header_bold</code>), and a legibility grade.
+        No correcting, no guessing.</p>
+        <div class="trust">the model transcribes — it never decides</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="num">2</div>
+      <div>
+        <h4>Deterministic checks <code>matching.py</code></h4>
+        <p>Code compares the transcription against the statutory warning word-for-word
+        (27&nbsp;CFR&nbsp;16.21) and verifies the ALL-CAPS header; parses ABV numerically and
+        cross-checks proof = 2&times;ABV; converts volume units (750&nbsp;mL&nbsp;=&nbsp;75&nbsp;cl);
+        applies a fuzzy band so <code>Stone's Throw</code> matches <code>STONE'S THROW</code> with a note.</p>
+        <div class="trust">the code decides — every rule unit-tested</div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="num">3</div>
+      <div>
+        <h4>Verdict rollup <code>matching.py</code></h4>
+        <p>Per-field results roll up conservatively: any deterministic violation rejects; anything
+        unconfirmable — fuzzy borderline, poor legibility, bold that can't be verified from the
+        photo — routes to a human instead of silently passing.</p>
+        <div class="trust">triage, not adjudication</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drop" style="margin-top:28px"></div>
+
+  <!-- responses -->
+  <div class="lanes" style="margin-top:2px">
+    <div>
+      <div class="lane-title">Lane A &middot; response</div>
+      <div class="box">
+        <h3>JSON result card</h3>
+        <p>Verdict plus a per-field table: application value vs. label value, with the reason
+        for every flag — the agent sees <em>why</em>, then accepts or rejects.</p>
+        <span class="sys">~2&ndash;4 s &middot; within the 5 s budget</span>
+      </div>
+    </div>
+    <div>
+      <div class="lane-title">Lane B &middot; response</div>
+      <div class="box">
+        <span class="adr">ADR-007</span>
+        <h3>NDJSON stream, completion order</h3>
+        <p>One result per line, the moment it finishes. Rows render live with an
+        <code style="font-family:var(--mono);font-size:12px">n / total</code> progress count —
+        minutes of visible progress, never a spinner. A failed label streams an ERROR row;
+        the rest of the batch is untouched.</p>
+        <span class="sys">application/x-ndjson</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="drop" style="margin-top:24px"></div>
+
+  <!-- verdict stamps -->
+  <div class="verdicts">
+    <div class="stamp s-a">Approved<small>all checks pass</small></div>
+    <div class="stamp s-r">Needs review<small>ambiguity → human judgment</small></div>
+    <div class="stamp s-x">Rejected<small>deterministic violation</small></div>
+  </div>
+  <div class="err-note">+ ERROR &mdash; per-label isolation: one bad file never sinks the batch</div>
+
+  <footer>
+    <span>docs/app-flow.html &middot; TTB Label Verification Prototype</span>
+    <span>decisions: docs/adr/ &middot; tests: backend/tests/</span>
+  </footer>
+
+</div>
+</body>
+</html>
